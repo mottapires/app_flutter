@@ -1,0 +1,52 @@
+workflows:
+  flutter-android-workflow:
+    name: Flutter Android Workflow
+    max_build_duration: 120
+    instance_type: mac_mini_m1
+    environment:
+      flutter: 3.19.0
+      java: 11
+      groups:
+        - google_credentials
+      vars:
+        CM_KEYSTORE_PATH: $CM_KEYSTORE
+        CM_KEY_ALIAS: $CM_KEY_ALIAS
+        CM_KEY_PASSWORD: $CM_KEY_PASSWORD
+        CM_KEYSTORE_PASSWORD: $CM_KEYSTORE_PASSWORD
+    triggering:
+      events:
+        - push
+        - pull_request
+        - tag
+      branch_patterns:
+        - pattern: '*'
+          include: true
+          source: true
+      cancel_previous_builds: false
+    scripts:
+      - name: Set up local.properties
+        script: |
+          echo "sdk.dir=/opt/android/sdk" > android/local.properties
+          echo "flutter.sdk=/opt/flutter" >> android/local.properties
+      - name: Get Flutter packages
+        script: |
+          flutter pub get
+      - name: Check Flutter installation
+        script: |
+          flutter --version
+          flutter doctor
+      - name: Flutter analyze
+        script: |
+          flutter analyze
+      - name: Run Flutter tests
+        script: |
+          flutter test
+    artifacts:
+      - build/**/outputs/**/*.apk
+      - build/**/outputs/**/*.aab
+      - build/**/outputs/**/mapping.txt
+      - flutter_drive.log
+    publishing:
+      email:
+        recipients:
+          - user@example.com
