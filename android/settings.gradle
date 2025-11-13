@@ -8,3 +8,5 @@ pluginManagement {
 
 rootProject.name = 'flutter_areal_app'
 include ':app'
+
+apply from: '../flutter/packages/flutter_tools/gradle/app_plugin_loader.gradle'
